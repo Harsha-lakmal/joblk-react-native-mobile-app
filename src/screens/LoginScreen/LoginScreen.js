@@ -51,26 +51,27 @@ const LoginScreen = () => {
     };
 
     const handleLogin = () => {
-        if (!validateForm()) return; // Form validation before proceeding
+        successMessage();
+        // if (!validateForm()) return; // Form validation before proceeding
 
-        setLoading(true); // Set loading to true while waiting for the response
-        instance.post('/user/login', { username, password })
-            .then((response) => {
-                setLoading(false); // Set loading to false after the response
+        // setLoading(true); // Set loading to true while waiting for the response
+        // instance.post('/user/login', { username, password })
+        //     .then((response) => {
+        //         setLoading(false); // Set loading to false after the response
 
-                if (response.data) {
-                    setAuthToken(response.data.token);
-                    successMessage();
-                    fetchUserData();
-                } else {
-                    errorMessage(response.data.message || "Login failed!");
-                }
-            })
-            .catch((error) => {
-                setLoading(false); // Set loading to false in case of error
-                console.error("Login error:", error);
-                errorMessage(error.response?.data?.message || "An error occurred. Try again.");
-            });
+        //         if (response.data) {
+        //             setAuthToken(response.data.token);
+        //             successMessage();
+        //             fetchUserData();
+        //         } else {
+        //             errorMessage(response.data.message || "Login failed!");
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         setLoading(false); // Set loading to false in case of error
+        //         console.error("Login error:", error);
+        //         errorMessage(error.response?.data?.message || "An error occurred. Try again.");
+        //     });
     };
 
     const fetchUserData = () => {

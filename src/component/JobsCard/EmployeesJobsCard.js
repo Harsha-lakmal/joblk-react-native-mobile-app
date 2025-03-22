@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import JoblkImge from '../../assets/joblk.png';
+import FilePickerManager from 'react-native-file-picker';
 
 function EmployeesJobsCard() {
   const [jobs, setJobs] = useState([]);
-  
+  const [selectedFile, setSelectedFile] = useState(null);
+
   useEffect(() => {
-    // Simulate fetching jobs (replace with real API call)
     const fetchedJobs = [
       {
         jobId: '1',
@@ -28,6 +29,19 @@ function EmployeesJobsCard() {
     setJobs(fetchedJobs);
   }, []);
 
+  // Handle file selection
+  const selectFile = () => {
+    FilePickerManager.showFilePicker(null, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled file picker');
+      } else if (response.error) {
+        console.log('FilePicker Error: ', response.error);
+      } else {
+        setSelectedFile(response);
+      }
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.cardContainer}>
       {jobs.length === 0 ? (
@@ -38,10 +52,7 @@ function EmployeesJobsCard() {
         jobs.map((job) => (
           <View key={job.jobId} style={styles.card}>
             <View style={styles.imageContainer}>
-              <Image
-                source={JoblkImge}
-                style={styles.jobImage}
-              />
+              <Image source={JoblkImge} style={styles.jobImage} />
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.jobTitle}>{job.jobTitle}</Text>
@@ -60,10 +71,23 @@ function EmployeesJobsCard() {
                   <Text style={styles.value}>{job.location}</Text>
                 </View>
               </View>
+
+
+              {/* File Upload Button */}
+              <TouchableOpacity style={styles.uploadButton} onPress={selectFile}>
+                <Text style={styles.uploadButtonText}>Upload Cv</Text>
+              </TouchableOpacity>
+
+              {/* Display Selected File */}
+              {selectedFile && (
+                <Text style={styles.fileName}>Selected File: {selectedFile.fileName || 'Unnamed File'}</Text>
+              )}
             </View>
           </View>
         ))
       )}
+
+
     </ScrollView>
   );
 }
@@ -92,11 +116,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     marginBottom: 20,
     overflow: 'hidden',
-    height: 400,  // Increased card height for larger image
+    height: 400,
   },
   imageContainer: {
     width: '100%',
-    height: 180,  // Increased image height
+    height: 180,
     overflow: 'hidden',
   },
   jobImage: {
@@ -131,6 +155,23 @@ const styles = StyleSheet.create({
   value: {
     color: '#666',
     marginLeft: 5,
+  },
+  uploadButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  fileName: {
+    marginTop: 10,
+    color: '#333',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

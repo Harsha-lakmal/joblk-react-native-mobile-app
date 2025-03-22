@@ -22,8 +22,8 @@ function App() {
         {/* <AboutEmployeScreen/> */}
         {/* <HomeEmployeScreen/> */}
 
-    {/* <EmployeNavigation/> */}
-    <EmployeesJobsCard/>
+    <EmployeNavigation/>
+    {/* <EmployeesJobsCard/> */}
 
     </View>
   );

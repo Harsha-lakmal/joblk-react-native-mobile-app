@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert  ,Button} from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 import styled from 'styled-components/native';
+import Toast from 'react-native-toast-message';
+
 
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
@@ -14,6 +16,23 @@ const AboutEmployeeScreen = () => {
             }
         });
     };
+    function get() {
+        Toast.show({
+            position: 'top',
+            text1: 'Sign Up Successful',
+            text2: 'Welcome aboard!',
+            type: 'success',
+        });
+    }
+
+    const showToast = () => {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Hello',
+          text2: 'This is a toast message',
+        });
+      };
 
     return (
         <Container>
@@ -27,7 +46,15 @@ const AboutEmployeeScreen = () => {
             <UploadButton onPress={() => Alert.alert('Upload functionality to be implemented')}>
                 <UploadButtonText>Upload</UploadButtonText>
             </UploadButton>
+            <UploadButton onPress={get()}>
+                <UploadButtonText>test</UploadButtonText>
+            </UploadButton>
+            <View>
+                <Button title="Show Toast" onPress={showToast} />
+                <Toast />
+            </View>
         </Container>
+
     );
 };
 

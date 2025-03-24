@@ -1,65 +1,103 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform,TouchableWithoutFeedback, Keyboard} from 'react-native';
+import React, { Suspense, useState } from 'react';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { instance, setAuthToken } from '../../services/AxiosHolder/AxiosHolder';
-import Swal from 'sweetalert2';
+import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
+import { instance } from '../../services/AxiosHolder/AxiosHolder';
+import Toast from 'react-native-toast-message';
 
 const SignUpScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("");  // Track role
+  const [email, setEmail] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('');
   const [tandc, setTandc] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const successMessage = () => {
-    Swal.fire({
-      position: "top-end",
-      icon: "success",
-      title: "SignUp Successful",
-      showConfirmButton: false,
-      timer: 2000,
-    });
-  };
+  const navigation = useNavigation();
 
-  const errorMessage = (msg) => {
-    Swal.fire({
-      position: "top-end",
-      icon: "error",
-      title: msg || "SignUp Unsuccessful",
-      showConfirmButton: false,
-      timer: 2000,
+  function successMessage() {
+    Toast.show({
+      position: 'top',
+      text1: 'Sign Up Successful',
+      text2: 'Welcome aboard!',
+      type: 'success',
     });
-  };
+  }
+
+  function errorMessage(message) {
+    Toast.show({
+      position: 'top',
+      text1: 'Sign Up Failed',
+      text2: message || 'An unexpected error occurred',
+      type: 'error',
+    });
+  }
+
+  function test() {
+    successMessage();
+    console.log("username : "+username);
+    console.log("passworld : "+password);
+    console.log("comfom passowld :  "+confirmPassword);
+    console.log("role : "+role);
+    
+    
+    
+    
+  }
 
   const validateForm = () => {
     if (!username || !password || !email || !confirmPassword || !role) {
-      errorMessage("Please fill all fields.");
-      return false;
-    }
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailRegex.test(email)) {
-      errorMessage("Please enter a valid email.");
+      errorMessage('Please fill all fields.');
       return false;
     }
     if (password !== confirmPassword) {
-      errorMessage("Passwords do not match.");
+      errorMessage('Passwords do not match.');
       return false;
     }
     return true;
   };
 
-  const handleSignUp = () => {
-    if (!validateForm()) return;
+  const handleSignUp = async () => {
+    if (!validateForm() || loading) return;
 
+    setLoading(true);
+
+    
+
+    const data = {
+      username :  username , 
+      email : email,
+      password : password , 
+      role : role 
+    };
+
+
+    console.log("data tika save : "+data.username);
+
+
+    try {
+      const response = await instance.post('user/register', data);
+      setLoading(false);
+
+      if (response.data.success) {
         successMessage();
-
+        navigation.navigate('Login');
+      } else {
+        errorMessage(response.data.message || 'Sign Up Failed');
+        console.log(response.data.message);
+        
+      }
+    } catch (error) {
+      console.log("error ekk"+error.response.data.message);
+      setLoading(false);
+      errorMessage(error.response?.data?.message || 'An unexpected error occurred');
+      
+    }
   };
 
-  const roles = ['Admin ', ' Employee ', ' Trainer ', ' Employees']; // Define the roles
+  const roles = ['Employee', 'Trainer', 'Employees'];
 
   return (
     <KeyboardAvoidingView
@@ -77,7 +115,6 @@ const SignUpScreen = () => {
               onChangeText={setUsername}
               mode="outlined"
               style={styles.input}
-              theme={{ colors: { text: '#ffff' } }}
             />
 
             <TextInput
@@ -86,8 +123,8 @@ const SignUpScreen = () => {
               onChangeText={setEmail}
               mode="outlined"
               style={styles.input}
-              theme={{ colors: { text: '#ffff' } }}
             />
+
             <TextInput
               label="Password"
               value={password}
@@ -95,8 +132,8 @@ const SignUpScreen = () => {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              theme={{ colors: { text: '#ffff' } }}
             />
+
             <TextInput
               label="Confirm Password"
               value={confirmPassword}
@@ -104,10 +141,8 @@ const SignUpScreen = () => {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              theme={{ colors: { text: '#ffff' } }}
             />
 
-            {/* Role Selection Dropdown */}
             <View style={styles.roleContainer}>
               <Text style={styles.label}>Role</Text>
               <Picker
@@ -133,24 +168,32 @@ const SignUpScreen = () => {
             <Button
               mode="contained"
               onPress={handleSignUp}
-              disabled={!tandc || loading} // Disable button while loading or if T&C is not checked
+              disabled={!tandc || loading}
               style={styles.button}
             >
               {loading ? 'Signing up...' : 'Sign Up'}
             </Button>
 
-
             <Button
               mode="outlined"
-              onPress={() => navigation.navigate('login')}
+              onPress={() => navigation.navigate('Login')}
               style={styles.button}
             >
               Login
             </Button>
 
+            <Button
+              mode="outlined"
+              onPress={test} // Call test here directly
+              style={styles.button}
+            >
+              Test
+            </Button>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
+
+      <Toast />
     </KeyboardAvoidingView>
   );
 };
@@ -159,29 +202,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    position: "relative",
   },
   border: {
-    position: "relative",
     top: -20,
   },
   innerContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: 'white',
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-    color: 'black',
   },
   input: {
     marginBottom: 10,
     backgroundColor: 'white',
-    color: '#FFFFFF',
     height: 50,
     fontSize: 20,
   },
@@ -189,7 +227,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    color: 'black',
     marginBottom: 5,
     fontSize: 16,
   },
@@ -207,9 +244,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   checkboxText: {
-    color: 'black',
     marginLeft: 8,
-    fontSize: 25,
+    fontSize: 16,
   },
   button: {
     marginBottom: 10,

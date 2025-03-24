@@ -1,77 +1,48 @@
 import React, { useState } from 'react';
-import {
-    View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform,
-    TouchableWithoutFeedback, Keyboard
-} from 'react-native';
+import {  View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform,  TouchableWithoutFeedback, Keyboard} from 'react-native';
 import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { instance, setAuthToken } from '../../services/AxiosHolder/AxiosHolder';
-import Swal from 'sweetalert2';
 import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [tandc, setTandc] = useState(false);
-    const [loading, setLoading] = useState(false); // Track loading state
-    // const navigation = useNavigation(); // Uncomment to use navigation
+    const [loading, setLoading] = useState(false); 
+    const navigation = useNavigation(); 
 
-    const successMessage = () => {
-        Swal.fire({
-            position: "top-end",
-            icon: "success",
-            title: "Login Successful",
-            showConfirmButton: false,
-            timer: 2000,
-        });
-    };
-
-    const errorMessage = (msg) => {
-        Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: msg || "Login Unsuccessful",
-            showConfirmButton: false,
-            timer: 2000,
-        });
-    };
+ 
 
     const validateForm = () => {
         if (!username || !password) {
-            errorMessage("Please fill all fields.");
             return false;
         }
-        // Optional: Add email validation for username if needed
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        if (!emailRegex.test(username)) {
-            errorMessage("Please enter a valid email.");
-            return false;
-        }
-        return true;
+       
     };
 
+ 
     const handleLogin = () => {
-        successMessage();
-        // if (!validateForm()) return; // Form validation before proceeding
+        if (!validateForm()) return; 
 
-        // setLoading(true); // Set loading to true while waiting for the response
-        // instance.post('/user/login', { username, password })
-        //     .then((response) => {
-        //         setLoading(false); // Set loading to false after the response
+        setLoading(true); 
+        instance.post('/user/login', { username, password })
+            .then((response) => {
+                setLoading(false); 
 
-        //         if (response.data) {
-        //             setAuthToken(response.data.token);
-        //             successMessage();
-        //             fetchUserData();
-        //         } else {
-        //             errorMessage(response.data.message || "Login failed!");
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         setLoading(false); // Set loading to false in case of error
-        //         console.error("Login error:", error);
-        //         errorMessage(error.response?.data?.message || "An error occurred. Try again.");
-        //     });
+                if (response.data) {
+                    setAuthToken(response.data.token);
+                    successMessage();
+                    fetchUserData();
+                } else {
+                    errorMessage(response.data.message || "Login failed!");
+                }
+            })
+            .catch((error) => {
+                setLoading(false); 
+                console.error("Login error:", error);
+                errorMessage(error.response?.data?.message || "An error occurred. Try again.");
+            });
     };
 
     const fetchUserData = () => {
@@ -85,9 +56,6 @@ const LoginScreen = () => {
                                 break;
                             case "Employee":
                                 navigation.navigate('EmployeeDashboard');
-                                break;
-                            case "Employees":
-                                navigation.navigate('EmployeesDashboard');
                                 break;
                             case "Trainer":
                                 navigation.navigate('TrainersDashboard');
@@ -120,7 +88,7 @@ const LoginScreen = () => {
                             onChangeText={setUsername}
                             mode="outlined"
                             style={styles.input}
-                            theme={{ colors: { text: '#ffff' } }}  // Ensure text color is white
+                            theme={{ colors: { text: '#ffff' } }}  
                         />
 
                         <TextInput
@@ -130,7 +98,7 @@ const LoginScreen = () => {
                             mode="outlined"
                             secureTextEntry
                             style={styles.input}
-                            theme={{ colors: { text: '#ffff' } }}  // Ensure text color is white
+                            theme={{ colors: { text: '#ffff' } }} 
                         />
 
                         <View style={styles.checkboxContainer}>
@@ -144,7 +112,7 @@ const LoginScreen = () => {
                         <Button
                             mode="contained"
                             onPress={handleLogin}
-                            disabled={!tandc || loading} // Disable button while loading or if T&C is not checked
+                            disabled={!tandc || loading} 
                             style={styles.button}
                         >
                             {loading ? 'Logging in...' : 'Login'}
@@ -169,23 +137,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         position: "relative",
-
     },
-
-    border:{
-        position : "relative" , 
-        top : -20,
-
-    }
-    ,
+    border: {
+        position: "relative",
+        top: -20,
+    },
     innerContainer: {
         flexGrow: 1,
         justifyContent: 'center',
-        paddingHorizontal: 20, // Reduce padding
+        paddingHorizontal: 20, 
         backgroundColor: 'white',
     },
     title: {
-        fontSize: 30, // Slightly smaller title
+        fontSize: 30, 
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 20,
@@ -195,9 +159,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         backgroundColor: 'white',
         color: '#FFFFFF',
-        height: 50, // Reduce height
+        height: 50, 
         fontSize: 20,
-
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -211,9 +174,9 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: 10,
-        height: 45, // Reduce button height
+        height: 45, 
         justifyContent: 'center',
-        width: '80%', // Make button width smaller
+        width: '80%', 
         alignSelf: 'center',
     },
 });

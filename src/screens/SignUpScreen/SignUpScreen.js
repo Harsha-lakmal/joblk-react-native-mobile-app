@@ -1,5 +1,5 @@
-import React, { Suspense, useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -17,39 +17,47 @@ const SignUpScreen = () => {
 
   const navigation = useNavigation();
 
+  const successAlert = () => {
+    Alert.alert(
+      'Successful Registration', 
+      'You can now login with your details.', 
+      [{
+        text: 'OK',
+        onPress: () => console.log('OK Pressed'),
+      }],
+      { cancelable: true }
+    );
+  };
+
+  const errorAlert = () => {
+    Alert.alert(
+      'Registration Unsuccessful', 
+      'Please try again later.', 
+      [{
+        text: 'OK',
+        onPress: () => console.log('OK Pressed'),
+      }],
+      { cancelable: true }
+    );
+  };
+
+  const errorMessage = (message) => {
+    Alert.alert('Error', message, [{ text: 'OK' }], { cancelable: true });
+  };
+
   function successMessage() {
     Toast.show({
       position: 'top',
       text1: 'Sign Up Successful',
-      text2: 'Welcome aboard!',
+      text2: 'Welcome to the User Portal!',
       type: 'success',
+      visibilityTime: 3000,
     });
-  }
-
-  function errorMessage(message) {
-    Toast.show({
-      position: 'top',
-      text1: 'Sign Up Failed',
-      text2: message || 'An unexpected error occurred',
-      type: 'error',
-    });
-  }
-
-  function test() {
-    successMessage();
-    console.log("username : "+username);
-    console.log("passworld : "+password);
-    console.log("comfom passowld :  "+confirmPassword);
-    console.log("role : "+role);
-    
-    
-    
-    
   }
 
   const validateForm = () => {
     if (!username || !password || !email || !confirmPassword || !role) {
-      errorMessage('Please fill all fields.');
+      errorMessage('Please fill in all fields.');
       return false;
     }
     if (password !== confirmPassword) {
@@ -64,40 +72,31 @@ const SignUpScreen = () => {
 
     setLoading(true);
 
-    
-
     const data = {
-      username :  username , 
-      email : email,
-      password : password , 
-      role : role 
+      username,
+      email,
+      password,
+      role,
     };
 
-
-    console.log("data tika save : "+data.username);
-
-
     try {
-      const response = await instance.post('user/register', data);
+      const response = await instance.post('/user/register', data);
       setLoading(false);
 
-      if (response.data.success) {
-        successMessage();
+      if (response.data) {
+        successAlert();
         navigation.navigate('Login');
+        successMessage();
       } else {
-        errorMessage(response.data.message || 'Sign Up Failed');
-        console.log(response.data.message);
-        
+        errorAlert();
       }
     } catch (error) {
-      console.log("error ekk"+error.response.data.message);
+      errorAlert();
       setLoading(false);
-      errorMessage(error.response?.data?.message || 'An unexpected error occurred');
-      
     }
   };
 
-  const roles = ['Employee', 'Trainer', 'Employees'];
+  const roles = ['Employee'];
 
   return (
     <KeyboardAvoidingView
@@ -180,14 +179,6 @@ const SignUpScreen = () => {
               style={styles.button}
             >
               Login
-            </Button>
-
-            <Button
-              mode="outlined"
-              onPress={test} // Call test here directly
-              style={styles.button}
-            >
-              Test
             </Button>
           </View>
         </ScrollView>

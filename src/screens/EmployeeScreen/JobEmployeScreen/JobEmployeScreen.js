@@ -2,34 +2,62 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import JoblkImge from '../../../assets/joblk.png';
 import FilePickerManager from 'react-native-file-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { instance } from '../../../services/AxiosHolder/AxiosHolder';
 
 const JobEmployeScreen = () => {
-    const [jobs, setJobs] = useState([]);
-    const [selectedFile, setSelectedFile] = useState(null);
+  const [jobs, setJobs] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [token, setToken] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-    useEffect(() => {
-        const fetchedJobs = [
-          {
-            jobId: '1',
-            jobTitle: 'Software Engineer',
-            jobDescription: 'Develop software solutions.',
-            qualifications: 'Bachelor’s Degree in Computer Science',
-            closingDate: '2025-03-30',
-            location: 'Panadura',
-          },
-          {
-            jobId: '2',
-            jobTitle: 'Frontend Developer',
-            jobDescription: 'Build user interfaces for web applications.',
-            qualifications: 'Bachelor’s in IT or equivalent',
-            closingDate: '2025-04-05',
-            location: 'Colombo',
-          },
-        ];
-        setJobs(fetchedJobs);
-      }, []);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const fetchedToken = await AsyncStorage.getItem('authToken');
+      const fetchedUserData = await AsyncStorage.getItem('userData');
+      if (!fetchedToken) {
+        setError('No authentication token found.');
+        setLoading(false);
+        return;
+      }
+      setToken(fetchedToken);
+      setUserData(JSON.parse(fetchedUserData)); 
+      getData(fetchedToken);
+    };
 
-        // Handle file selection
+    fetchUserData();
+
+    const interval = setInterval(() => {
+      if (token) {
+        getData(token);
+      }
+    }, 40000);
+
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const getData = (token) => {
+    if (!token) return;
+    instance.get('/job/getAllJobs', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+
+
+      .then((response) => {
+        console.log(response.data.content.jobId);
+        
+        setJobs(response.data.content);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError('Failed to load jobs.');
+        setLoading(false);
+        console.error(error);
+      });
+  };
+
   const selectFile = () => {
     FilePickerManager.showFilePicker(null, (response) => {
       if (response.didCancel) {
@@ -42,60 +70,62 @@ const JobEmployeScreen = () => {
     });
   };
 
-
   return (
-   <ScrollView contentContainerStyle={styles.cardContainer}>
-        {jobs.length === 0 ? (
-          <View style={styles.noJobsContainer}>
-            <Text style={styles.noJobsText}>No jobs available at the moment.</Text>
-          </View>
-        ) : (
-          jobs.map((job) => (
-            <View key={job.jobId} style={styles.card}>
-              <View style={styles.imageContainer}>
-                <Image source={JoblkImge} style={styles.jobImage} />
-              </View>
-              <View style={styles.cardContent}>
-                <Text style={styles.jobTitle}>{job.jobTitle}</Text>
-                <Text style={styles.jobDescription}>{job.jobDescription}</Text>
-                <View style={styles.jobDetails}>
-                  <View style={styles.jobDetailItem}>
-                    <Text style={styles.label}>Qualifications:</Text>
-                    <Text style={styles.value}>{job.qualifications}</Text>
-                  </View>
-                  <View style={styles.jobDetailItem}>
-                    <Text style={styles.label}>Closing Date:</Text>
-                    <Text style={styles.value}>{job.closingDate}</Text>
-                  </View>
-                  <View style={styles.jobDetailItem}>
-                    <Text style={styles.label}>Location:</Text>
-                    <Text style={styles.value}>{job.location}</Text>
-                  </View>
-                </View>
-  
-  
-                {/* File Upload Button */}
-                <TouchableOpacity style={styles.uploadButton} onPress={selectFile}>
-                  <Text style={styles.uploadButtonText}>Upload Cv</Text>
-                </TouchableOpacity>
-  
-                {/* Display Selected File */}
-                {selectedFile && (
-                  <Text style={styles.fileName}>Selected File: {selectedFile.fileName || 'Unnamed File'}</Text>
-                )}
-              </View>
+    <ScrollView contentContainerStyle={styles.cardContainer}>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : jobs.length === 0 ? (
+        <View style={styles.noJobsContainer}>
+          <Text style={styles.noJobsText}>No jobs available at the moment.</Text>
+        </View>
+      ) : (
+        jobs.map((job) => (
+          <View key={job.jobId} style={styles.card}>
+            <View style={styles.imageContainer}>
+              <Image source={JoblkImge || job.imgPath} style={styles.jobImage} />
             </View>
-          ))
-        )}
-  
-  
-      </ScrollView>
+            <View style={styles.cardContent}>
+              <Text style={styles.jobTitle}>{job.jobTitle}</Text>
+              <Text style={styles.jobDescription}>{job.jobDescription}</Text>
+              <View style={styles.jobDetails}>
+                <View style={styles.jobDetailItem}>
+                  <Text style={styles.label}>Qualifications:</Text>
+                  <Text style={styles.value}>{job.qualifications}</Text>
+                </View>
+                <View style={styles.jobDetailItem}>
+                  <Text style={styles.label}>Closing Date:</Text>
+                  <Text style={styles.value}>{job.jobClosingDate}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.uploadButton} onPress={selectFile}>
+                <Text style={styles.uploadButtonText}>Upload CV</Text>
+              </TouchableOpacity>
+
+              {selectedFile && (
+                <Text style={styles.fileName}>Selected File: {selectedFile.fileName || 'Unnamed File'}</Text>
+              )}
+            </View>
+          </View>
+        ))
+      )}
+
+     
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   cardContainer: {
     padding: 10,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
   noJobsContainer: {
     justifyContent: 'center',
@@ -175,8 +205,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-
-
 
 export default JobEmployeScreen;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import FilePickerManager from 'react-native-file-picker';
 import courseImge from '../../../assets/joblk.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
@@ -69,6 +70,13 @@ const HomeEmployeScreen = () => {
     ];
     setCourses(fetchedCourses);
   }, []);
+
+  function get(){
+    const userData  =  AsyncStorage.getItem('userData');
+    console.log("run ... ");
+    console.log(userData);
+    
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.cardContainer}>
@@ -157,9 +165,15 @@ const HomeEmployeScreen = () => {
                   <Text style={styles.fileName}>Selected File: {selectedFile.fileName || 'Unnamed File'}</Text>
                 )}
               </View>
+
             </View>
           ))
         )}
+
+        <TouchableOpacity style={styles.uploadButton} onPress={get()}>
+          <Text style={styles.uploadButtonText}>Test</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </ScrollView>
   );

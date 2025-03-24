@@ -1,75 +1,116 @@
 import React, { useState } from 'react';
-import {  View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform,  TouchableWithoutFeedback, Keyboard} from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { instance, setAuthToken } from '../../services/AxiosHolder/AxiosHolder';
+import { instance } from '../../services/AxiosHolder/AxiosHolder';
 import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [tandc, setTandc] = useState(false);
-    const [loading, setLoading] = useState(false); 
-    const navigation = useNavigation(); 
+    const [loading, setLoading] = useState(false);
+    const navigation = useNavigation();
 
- 
+    const successAlert = () => {
+        Alert.alert(
+            'Successful Login',
+            'Welcome to the Dashboard',
+            [
+                {
+                    text: 'OK',
+                    onPress: () => console.log('OK Pressed'),
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    const errorAlert = () => {
+        Alert.alert(
+            'Unsuccessful Login',
+            'Try Again Later',
+            [
+                {
+                    text: 'OK',
+                    onPress: () => console.log('OK Pressed'),
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    const errorMessage = (message) => {
+        Alert.alert('Error', message, [{ text: 'OK' }], { cancelable: true });
+    };
 
     const validateForm = () => {
         if (!username || !password) {
             return false;
         }
-       
+        return true;
     };
 
- 
     const handleLogin = () => {
-        if (!validateForm()) return; 
+        if (!validateForm()) {
+            errorMessage('Please fill in all fields');
+            return;
+        }
 
-        setLoading(true); 
+        setLoading(true);
         instance.post('/user/login', { username, password })
             .then((response) => {
-                setLoading(false); 
+                setLoading(false);
+                successAlert();
 
                 if (response.data) {
-                    setAuthToken(response.data.token);
-                    successMessage();
-                    fetchUserData();
+                    console.log(response.data);
+
+                    // Save auth token
+                    AsyncStorage.setItem('authToken', response.data)
+                        .then(() => {
+                            fetchUserData();
+                        })
+                        .catch(() => errorMessage('Could not save auth token.'));
                 } else {
-                    errorMessage(response.data.message || "Login failed!");
+                    errorMessage(response.data.message || 'Login failed!');
                 }
             })
             .catch((error) => {
-                setLoading(false); 
-                console.error("Login error:", error);
-                errorMessage(error.response?.data?.message || "An error occurred. Try again.");
+                setLoading(false);
+                console.error('Login error:', error?.response?.data || error);
+                errorMessage(error?.response?.data?.message || 'An error occurred. Try again.');
             });
     };
 
-    const fetchUserData = () => {
-        instance.get(`/user/getUser/${username}`)
-            .then((response) => {
-                AsyncStorage.setItem("userData", JSON.stringify(response.data))
-                    .then(() => {
-                        switch (response.data.role) {
-                            case "Admin":
-                                navigation.navigate('AdminDashboard');
-                                break;
-                            case "Employee":
-                                navigation.navigate('EmployeeDashboard');
-                                break;
-                            case "Trainer":
-                                navigation.navigate('TrainersDashboard');
-                                break;
-                            default:
-                                errorMessage("Invalid user role");
-                        }
-                    })
-                    .catch(() => errorMessage("Could not save user data."));
+    const fetchUserData = async () => {
+        try {
+            const token = await AsyncStorage.getItem('authToken');
+            console.log("token : " + token);
+            console.log(username);
+
+            instance.get(`/user/getUser/${username}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
             })
-            .catch((error) => {
-                console.error('Error fetching user data:', error);
-                errorMessage("Could not fetch user data. Please try again.");
-            });
+                .then((response) => {
+                    console.log(response);
+                    
+                    AsyncStorage.setItem('userData', JSON.stringify(response.data))
+                        .catch(() => errorMessage('Could not save user data.'));
+                    
+                    // Navigate to EmployeeMenu after fetching user data
+                    navigation.navigate('Menu');
+                })
+                .catch((error) => {
+                    console.error('Error fetching user data:', error);
+                    errorMessage('Could not fetch user data. Please try again.');
+                });
+        } catch (error) {
+            console.error('Error getting auth token:', error);
+            errorMessage('Could not retrieve auth token. Please try again.');
+        }
     };
 
     return (
@@ -88,7 +129,7 @@ const LoginScreen = () => {
                             onChangeText={setUsername}
                             mode="outlined"
                             style={styles.input}
-                            theme={{ colors: { text: '#ffff' } }}  
+                            theme={{ colors: { text: '#ffff' } }}
                         />
 
                         <TextInput
@@ -98,7 +139,7 @@ const LoginScreen = () => {
                             mode="outlined"
                             secureTextEntry
                             style={styles.input}
-                            theme={{ colors: { text: '#ffff' } }} 
+                            theme={{ colors: { text: '#ffff' } }}
                         />
 
                         <View style={styles.checkboxContainer}>
@@ -112,7 +153,7 @@ const LoginScreen = () => {
                         <Button
                             mode="contained"
                             onPress={handleLogin}
-                            disabled={!tandc || loading} 
+                            disabled={!tandc || loading}
                             style={styles.button}
                         >
                             {loading ? 'Logging in...' : 'Login'}
@@ -136,20 +177,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
-        position: "relative",
+        position: 'relative',
     },
     border: {
-        position: "relative",
+        position: 'relative',
         top: -20,
     },
     innerContainer: {
         flexGrow: 1,
         justifyContent: 'center',
-        paddingHorizontal: 20, 
+        paddingHorizontal: 20,
         backgroundColor: 'white',
     },
     title: {
-        fontSize: 30, 
+        fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 20,
@@ -159,7 +200,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         backgroundColor: 'white',
         color: '#FFFFFF',
-        height: 50, 
+        height: 50,
         fontSize: 20,
     },
     checkboxContainer: {
@@ -174,9 +215,9 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: 10,
-        height: 45, 
+        height: 45,
         justifyContent: 'center',
-        width: '80%', 
+        width: '80%',
         alignSelf: 'center',
     },
 });

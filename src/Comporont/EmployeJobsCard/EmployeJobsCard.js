@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import JoblkImge from '../../assets/joblk.png';
 import FilePickerManager from 'react-native-file-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,8 +17,6 @@ const EmployeJobsCard = () => {
     const fetchUserData = async () => {
       try {
         const fetchedToken = await AsyncStorage.getItem('authToken');
-        const fetchedUserData = await AsyncStorage.getItem('userData');
-        
         if (!fetchedToken) {
           setError('No authentication token found.');
           setLoading(false);
@@ -39,37 +37,48 @@ const EmployeJobsCard = () => {
       }
     }, 40000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); 
   }, [token]);
 
-  const getData = async (token) => {
-    try {
-      const response = await instance.get('/job/getAllJobs', {
-        headers: { 'Authorization': `Bearer ${token}` },
+  const getData = (authToken) => {
+    if (!authToken) return;
+    instance
+      .get('/job/getAllJobs', {
+        headers: { 'Authorization': `Bearer ${authToken}` },
+      })
+      .then((response) => {
+        setJobs(response.data.content);
+        const newImages = {};
+        response.data.content.forEach((job) => {
+          getimg(job.jobId, authToken);
+        });
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError('Failed to load jobs.');
+        setLoading(false);
+        console.error(error);
       });
-      setJobs(response.data.content);
-      setLoading(false);
-      
-      const newImages = {};
-      for (const job of response.data.content) {
-        await getimg(job.jobId, newImages);
-      }
-      setCourseImages(newImages);
-    } catch (error) {
-      setError('Failed to load jobs.');
-      setLoading(false);
-    }
   };
 
- const getimg = (jobId, newImages) => {
+  const getimg = (jobId, authToken) => {
     instance
       .get(`/job/get/image/${jobId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 'Authorization': `Bearer ${authToken}` },
         responseType: 'blob',
       })
       .then((res) => {
-        newImages[jobId] = URL.createObjectURL(res.data);
-        setCourseImages((prevImages) => ({ ...prevImages, ...newImages }));
+        // Convert blob to base64 for React Native
+        if (res.data) {
+          const reader = new FileReader();
+          reader.readAsDataURL(res.data);
+          reader.onloadend = () => {
+            setCourseImages((prevImages) => ({
+              ...prevImages,
+              [jobId]: reader.result
+            }));
+          };
+        }
       })
       .catch((err) => {
         console.error('Error fetching image:', err);
@@ -84,6 +93,7 @@ const EmployeJobsCard = () => {
         console.log('FilePicker Error: ', response.error);
       } else {
         setSelectedFile(response);
+        console.log('Selected File:', response);
       }
     });
   };
@@ -102,7 +112,14 @@ const EmployeJobsCard = () => {
         jobs.map((job) => (
           <View key={job.jobId} style={styles.card}>
             <View style={styles.imageContainer}>
-              <Image source={courseImages[job.jobId] ? { uri: courseImages[job.jobId] } : JoblkImge} style={styles.jobImage} />
+              <Image 
+                source={
+                  courseImages[job.jobId] 
+                    ? { uri: courseImages[job.jobId] } 
+                    : JoblkImge
+                } 
+                style={styles.jobImage} 
+              />
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.jobTitle}>{job.jobTitle}</Text>
@@ -123,7 +140,9 @@ const EmployeJobsCard = () => {
               </TouchableOpacity>
 
               {selectedFile && (
-                <Text style={styles.fileName}>Selected File: {selectedFile.fileName || 'Unnamed File'}</Text>
+                <Text style={styles.fileName}>
+                  Selected File: {selectedFile.fileName || 'Unnamed File'}
+                </Text>
               )}
             </View>
           </View>

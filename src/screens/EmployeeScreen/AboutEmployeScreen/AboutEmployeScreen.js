@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Alert  ,Button} from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert, Button, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
-import styled from 'styled-components/native';
-import Toast from 'react-native-toast-message';
-
+import UpdateUserCard from '../../../Comporont/UpdateUserCard/UpdateUserCard';
 
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
@@ -16,98 +14,198 @@ const AboutEmployeeScreen = () => {
             }
         });
     };
-    function get() {
-        Toast.show({
-            position: 'top',
-            text1: 'Sign Up Successful',
-            text2: 'Welcome aboard!',
-            type: 'success',
-        });
-    }
 
-    const showToast = () => {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          text1: 'Hello',
-          text2: 'This is a toast message',
-        });
-      };
+
 
     return (
-        <Container>
-            <CoverImageContainer onPress={() => pickImage(setCoverImage)}>
-                <CoverImage source={coverImage ? { uri: coverImage } : require('../../../assets/joblk.png')} />
-            </CoverImageContainer>
-            <ProfileImageContainer onPress={() => pickImage(setProfileImage)}>
-                <ProfileImage source={profileImage ? { uri: profileImage } : require('../../../assets/joblk.png')} />
-            </ProfileImageContainer>
-            <Name>John Doe</Name>
-            <UploadButton onPress={() => Alert.alert('Upload functionality to be implemented')}>
-                <UploadButtonText>Upload</UploadButtonText>
-            </UploadButton>
-            <UploadButton onPress={get()}>
-                <UploadButtonText>test</UploadButtonText>
-            </UploadButton>
-            <View>
-                <Button title="Show Toast" onPress={showToast} />
-                <Toast />
+        <ScrollView>
+
+            <View style={styles.container}>
+                <TouchableOpacity onPress={() => pickImage(setCoverImage)} style={styles.coverImageContainer}>
+                    <Image
+                        source={coverImage ? { uri: coverImage } : require('../../../assets/joblk.png')}
+                        style={styles.coverImage}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => pickImage(setProfileImage)} style={styles.profileImageContainer}>
+                    <Image
+                        source={profileImage ? { uri: profileImage } : require('../../../assets/joblk.png')}
+                        style={styles.profileImage}
+                    />
+                </TouchableOpacity>
+                <View style={styles.infoContainer}>
+                    {/* Employee Info */}
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Name</Text>
+                        <Text style={styles.value}>Harsha Lakmal</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Email</Text>
+                        <Text style={styles.value}>Lakmalharsha@gmail.com</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Role</Text>
+                        <Text style={styles.value}>User</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Password</Text>
+                        <Text style={styles.value}>••••••</Text>
+                    </View>
+                </View>
+
+
+                <View style={styles.buttonWrapper}>
+
+                        <UpdateUserCard/>
+
+                    <TouchableOpacity style={styles.loginButton}>
+                        <Text style={styles.loginButtonText}>Login out </Text>
+                    </TouchableOpacity>
+                </View>
+
+
             </View>
-        </Container>
+
+
+        </ScrollView>
+
+
 
     );
 };
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f5f5f5',
+        padding: 20,
+    },
+    coverImageContainer: {
+        width: '100%',
+        height: 300,
+        backgroundColor: '#ddd',
+        borderRadius: 15,
+        overflow: 'hidden',
+        marginBottom: 30,
+    },
+    coverImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 15,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+    },
+    profileImageContainer: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        overflow: 'hidden',
+        borderWidth: 4,
+        borderColor: '#fff',
+        marginTop: -60,
+        backgroundColor: '#fff',
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 60,
+    },
+    buttonWrapper: {
+        width: '100%',
+        marginTop: 30,
+    },
+    uploadButton: {
+        backgroundColor: '#007bff',
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 15,
+        alignItems: 'center',
+        elevation: 3,
+        width: "100%",
+        height: 60 
+    },
+    uploadButtonText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    cardName: {
+        backgroundColor: '#fff',  
+        padding: 20,
+        borderRadius: 8,
+        marginBottom: 15,
+        alignItems: 'flex-start', 
+        elevation: 3,
+        width: '100%',
+        marginBottom: 30,
+        borderWidth: 1,
+        borderColor: '#ddd',  
+    },
+    name: {
+        color: '#000',  
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    email: {
+        color: '#000',  
+        fontSize: 16,
+        marginTop: 10,
+    },
+    role: {
+        color: '#000',  
+        fontSize: 16,
+        marginTop: 10,
+    },
+    password: {
+        color: '#000',  
+        fontSize: 16,
+        marginTop: 10,
+    },
 
-const Container = styled.View`
-    flex: 1;
-    align-items: center;
-    background-color: #f5f5f5;
-`;
+    infoContainer: {
+        width: '100%',
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        elevation: 2,
+        marginBottom: 20,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        justifyContent: 'space-between',
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#007bff',
+    },
+    value: {
+        fontSize: 16,
+        color: '#333',
+    },
+    loginButton : {
+        backgroundColor: 'red',
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 15,
+        alignItems: 'center',
+        elevation: 3,
+        width: "100%",
+        height: 60 
 
-const CoverImageContainer = styled.TouchableOpacity`
-    width: 100%;
-    height: 200px;
-`;
+    }, 
+    loginButtonText : {
+        color: '#fff',
+        fontSize: 30,
+        fontWeight: 'bold',
 
-const CoverImage = styled.Image`
-    width: 100%;
-    height: 100%;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-`;
+    }
+});
 
-const ProfileImageContainer = styled.TouchableOpacity`
-    margin-top: -50px;
-    border-radius: 50px;
-    overflow: hidden;
-    border-width: 3px;
-    border-color: #fff;
-`;
-
-const ProfileImage = styled.Image`
-    width: 100px;
-    height: 100px;
-    border-radius: 50px;
-`;
-
-const Name = styled.Text`
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #333;
-`;
-
-const UploadButton = styled.TouchableOpacity`
-    margin-top: 20px;
-    padding: 12px 20px;
-    background-color: #007bff;
-    border-radius: 5px;
-`;
-
-const UploadButtonText = styled.Text`
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-`;
 
 export default AboutEmployeeScreen;

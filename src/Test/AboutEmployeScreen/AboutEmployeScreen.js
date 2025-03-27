@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
-import UpdateUserCard from '../../../Comporont/UpdateUserCard/UpdateUserCard';
+import UpdateUserCard from '../../Comporont/UpdateUserCard/UpdateUserCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { instance } from "../../../services/AxiosHolder/AxiosHolder";
+import { instance } from "../../services/AxiosHolder/AxiosHolder";
 
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
@@ -14,7 +14,7 @@ const AboutEmployeeScreen = () => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const navigation = useNavigation();
+    // const navigation = useNavigation(); 
 
     // Fetch user data from AsyncStorage
     useEffect(() => {
@@ -42,6 +42,13 @@ const AboutEmployeeScreen = () => {
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (userId) {
+            getCoverImage();
+            getProfileImage();
+        }
+    }, [userId]);
 
     const pickImage = (setImage) => {
         const options = {
@@ -73,7 +80,7 @@ const AboutEmployeeScreen = () => {
             await AsyncStorage.removeItem('userData');
             await AsyncStorage.removeItem('authToken');
             Alert.alert('Logged out successfully');
-            navigation.navigate('Login');
+            // navigation.navigate('Login');
         } catch (error) {
             console.error("Logout error:", error);
         }
@@ -209,7 +216,7 @@ const AboutEmployeeScreen = () => {
                         source={
                             coverImage && coverImage.uri 
                                 ? { uri: coverImage.uri }
-                                : require('../../../assets/joblk.png')
+                                : require('../../assets/joblk.png')
                         }
                         style={styles.coverImage}
                         resizeMode="cover"
@@ -221,7 +228,7 @@ const AboutEmployeeScreen = () => {
                         source={
                             profileImage && profileImage.uri 
                                 ? { uri: profileImage.uri }
-                                : require('../../../assets/joblk.png')
+                                : require('../../assets/joblk.png')
                         }
                         style={styles.profileImage}
                         resizeMode="cover"

@@ -6,6 +6,7 @@ import SignUpScreen from './src/screens/SignUpScreen/SignUpScreen';
 import EmployeMenu from './src/screens/EmployeeScreen/EmployeMenu/EmployeMenu';
 import JobEmployeScreen from './src/screens/EmployeeScreen/JobEmployeScreen/JobEmployeScreen';
 import AboutEmployeeScreen from './src/screens/EmployeeScreen/AboutEmployeScreen/AboutEmployeScreen';
+import AboutEmployeeScreenTest from './src/Test/AboutEmployeScreen/AboutEmployeScreen';
 import { Text ,View} from 'react-native';
 const Stack = createStackNavigator();
 
@@ -18,8 +19,9 @@ function App() {
         <Stack.Screen name="SignUp" component={SignUpScreen} />
       </Stack.Navigator>
     </NavigationContainer>
+    
     // <View>
-    //   <AboutEmployeeScreen/>
+    //   <AboutEmployeeScreenTest/>
     // </View>
  
   

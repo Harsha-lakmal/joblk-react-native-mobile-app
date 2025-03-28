@@ -3,12 +3,9 @@ import { View, Text, Image, TouchableOpacity, Alert, StyleSheet, ScrollView } fr
 import { instance } from "../../services/AxiosHolder/AxiosHolder";
 import joblkimg from "../../assets/joblk.png";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import FilePickerManager from 'react-native-file-picker';
-
 
 function EmployeCourseCard() {
     const [courses, setCourses] = useState([]);
-    const [selectedFile, setSelectedFile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [courseImages, setCourseImages] = useState({});
@@ -52,7 +49,6 @@ function EmployeCourseCard() {
             setCourses(response.data.content);
             setLoading(false);
 
-            // Fetch images for new courses only
             response.data.content.forEach((course) => {
                 if (!courseImages[course.courseId]) {
                     getimg(course.courseId);
@@ -74,7 +70,6 @@ function EmployeCourseCard() {
                 responseType: 'arraybuffer',
             });
 
-            // Convert arraybuffer to base64
             const base64 = btoa(
                 new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
             );
@@ -87,7 +82,6 @@ function EmployeCourseCard() {
             }));
         } catch (err) {
             console.error("Error fetching image:", err);
-            // Optionally, you can set a default image or handle the error differently
         }
     };
 
@@ -99,7 +93,6 @@ function EmployeCourseCard() {
                 },
             });
 
-            // If there is a change in course data, update the state
             if (JSON.stringify(response.data.content) !== JSON.stringify(courses)) {
                 setCourses(response.data.content);
                 response.data.content.forEach((course) => {
@@ -114,18 +107,39 @@ function EmployeCourseCard() {
         }
     };
 
-    const selectFile = () => {
-        FilePickerManager.showFilePicker(null, (response) => {
-          if (response.didCancel) {
-            console.log('User cancelled file picker');
-          } else if (response.error) {
-            console.log('FilePicker Error: ', response.error);
-          } else {
-            setSelectedFile(response);
-            console.log('Selected File:', response);
-          }
-        });
-      };
+    const cvUploadHandle = async () => {
+        try {
+            const storedUserData = await AsyncStorage.getItem('userData');
+            const storedToken = await AsyncStorage.getItem('authToken');
+            
+            const parsedUserData = JSON.parse(storedUserData);
+            const userId = parsedUserData.id; 
+            
+            if (!userId || !storedToken) return;
+
+            setError("");
+
+            const response = await instance.get(`/user/getCvDocument/${userId}`, {
+                headers: { Authorization: `Bearer ${storedToken}` },
+                responseType: 'blob', 
+            });
+
+            if (response.data) {
+                const blob = response.data;
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result;
+                    console.log(base64String);
+                    Alert.alert("CV Document  Successfully");
+                };
+                reader.readAsDataURL(blob);
+            }
+
+        } catch (err) {
+            Alert.alert("Failed to  CV document ");
+            console.error("Error fetching CV document:", err.response || err);
+        }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -165,15 +179,10 @@ function EmployeCourseCard() {
                             <Text style={styles.text}>{course.courseLocation}</Text>
                         </View>
 
-                        <TouchableOpacity style={styles.uploadButton} onPress={selectFile}>
+                        <TouchableOpacity style={styles.uploadButton} onPress={cvUploadHandle}>
                             <Text style={styles.uploadButtonText}>Upload CV</Text>
                         </TouchableOpacity>
 
-                        {selectedFile && (
-                            <Text style={styles.fileName}>
-                                Selected File: {selectedFile.fileName || 'Unnamed File'}
-                            </Text>
-                        )}
                     </View>
                 </View>
             ))}
@@ -259,5 +268,10 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
     },
+    fileName: {
+        fontSize: 16,
+        marginTop: 8,
+    },
 });
+
 export default EmployeCourseCard;

@@ -11,7 +11,6 @@ function UpdateUserCard() {
   const [userId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
 
-  // Fetch stored user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -59,10 +58,7 @@ function UpdateUserCard() {
 
   const updateUser = async () => {
     try {
-      // if (!userId || !username || !email) {
-      //   showErrorMessage("Please fill all required fields.");
-      //   return;
-      // }
+    
 
       const userData = { id: userId, username, password, email };
 

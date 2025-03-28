@@ -6,13 +6,11 @@ import HomeEmployeScreen from "../HomeEmployeScreen/HomeEmployeScreen";
 import CourseEmployeScreen from "../CourseEmployeScreen/CourseEmployeScreen";
 import AboutEmployeScreen from "../AboutEmployeScreen/AboutEmployeScreen";
 
-// Import Icons
 const homeIcon = require("../../../assets/home.png");
 const aboutIcon = require("../../../assets/about.png");
 const jobIcon = require("../../../assets/job.png");
 const courseIcon = require("../../../assets/course.png");
 
-// Dummy Screens Wrapping Actual Components
 const HomeScreen = () => (
   <SafeAreaView style={{ flex: 1 }}>
     <HomeEmployeScreen />
@@ -37,7 +35,6 @@ const CourseScreen = () => (
   </View>
 );
 
-// Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
 
 export default function EmployeMenu() {

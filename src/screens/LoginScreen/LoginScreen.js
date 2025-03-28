@@ -66,7 +66,6 @@ const LoginScreen = () => {
                 if (response.data) {
                     console.log(response.data);
 
-                    // Save auth token
                     AsyncStorage.setItem('authToken', response.data)
                         .then(() => {
                             fetchUserData();
@@ -97,13 +96,23 @@ const LoginScreen = () => {
                 }
             })
                 .then((response) => {
-                    console.log(response);
                     
                     AsyncStorage.setItem('userData', JSON.stringify(response.data))
                         .catch(() => errorMessage('Could not save user data.'));
                     
-                    // Navigate to EmployeeMenu after fetching user data
-                    navigation.navigate('Menu');
+
+                        const navigateRole = response.data.role; 
+                        console.log("response role : " + navigateRole);
+    
+                        if (navigateRole === "Employee") { 
+                            console.log("open to menu");
+    
+                            navigation.navigate('Menu');
+                        } else {
+                            console.log("open to error");
+    
+                            navigation.navigate('error'); 
+                        }
                 })
                 .catch((error) => {
                     console.error('Error fetching user data:', error);

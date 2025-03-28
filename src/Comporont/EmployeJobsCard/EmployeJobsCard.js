@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import JoblkImge from '../../assets/joblk.png';
 import FilePickerManager from 'react-native-file-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { instance } from '../../../src/services/AxiosHolder/AxiosHolder';
+import { instance } from '../../services/AxiosHolder/AxiosHolder';
 
 const EmployeJobsCard = () => {
   const [jobs, setJobs] = useState([]);
@@ -68,7 +68,6 @@ const EmployeJobsCard = () => {
         responseType: 'blob',
       })
       .then((res) => {
-        // Convert blob to base64 for React Native
         if (res.data) {
           const reader = new FileReader();
           reader.readAsDataURL(res.data);
@@ -84,19 +83,39 @@ const EmployeJobsCard = () => {
         console.error('Error fetching image:', err);
       });
   };
+  const cvUploadHandle = async () => {
+    try {
+        const storedUserData = await AsyncStorage.getItem('userData');
+        const storedToken = await AsyncStorage.getItem('authToken');
+        
+        const parsedUserData = JSON.parse(storedUserData);
+        const userId = parsedUserData.id; 
+        
+        if (!userId || !storedToken) return;
 
-  const selectFile = () => {
-    FilePickerManager.showFilePicker(null, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled file picker');
-      } else if (response.error) {
-        console.log('FilePicker Error: ', response.error);
-      } else {
-        setSelectedFile(response);
-        console.log('Selected File:', response);
-      }
-    });
-  };
+        setError("");
+
+        const response = await instance.get(`/user/getCvDocument/${userId}`, {
+            headers: { Authorization: `Bearer ${storedToken}` },
+            responseType: 'blob', 
+        });
+
+        if (response.data) {
+            const blob = response.data;
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result;
+                console.log(base64String);
+                Alert.alert("CV Document  Successfully");
+            };
+            reader.readAsDataURL(blob);
+        }
+
+    } catch (err) {
+        Alert.alert("Failed to  CV document ");
+        console.error("Error fetching CV document:", err.response || err);
+    }
+}
 
   return (
     <ScrollView contentContainerStyle={styles.cardContainer}>
@@ -135,15 +154,11 @@ const EmployeJobsCard = () => {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.uploadButton} onPress={selectFile}>
+              <TouchableOpacity style={styles.uploadButton} onPress={cvUploadHandle}>
                 <Text style={styles.uploadButtonText}>Upload CV</Text>
               </TouchableOpacity>
 
-              {selectedFile && (
-                <Text style={styles.fileName}>
-                  Selected File: {selectedFile.fileName || 'Unnamed File'}
-                </Text>
-              )}
+             
             </View>
           </View>
         ))

@@ -4,10 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen/SignUpScreen';
 import EmployeMenu from './src/screens/EmployeeScreen/EmployeMenu/EmployeMenu';
-import JobEmployeScreen from './src/screens/EmployeeScreen/JobEmployeScreen/JobEmployeScreen';
-import AboutEmployeeScreen from './src/screens/EmployeeScreen/AboutEmployeScreen/AboutEmployeScreen';
-import AboutEmployeeScreenTest from './src/Test/AboutEmployeScreen/AboutEmployeScreen';
-import { Text ,View} from 'react-native';
+import NotFoundPage from './src/Comporont/NotFoundPage/NotFoundPage';
 const Stack = createStackNavigator();
 
 function App() {
@@ -17,14 +14,9 @@ function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Menu" component={EmployeMenu} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="error" component={NotFoundPage} />
       </Stack.Navigator>
-    </NavigationContainer>
-    
-    // <View>
-    //   <AboutEmployeeScreenTest/>
-    // </View>
- 
-  
+    </NavigationContainer>  
   ) ; 
 }
 

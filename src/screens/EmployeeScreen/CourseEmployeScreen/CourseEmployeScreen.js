@@ -15,7 +15,7 @@ const CourseEmployeScreen = () => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        padding: 10,
+        padding: 10,  
     }
  
 });

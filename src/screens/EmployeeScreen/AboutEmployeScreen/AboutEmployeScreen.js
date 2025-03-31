@@ -5,6 +5,7 @@ import UpdateUserCard from '../../../Comporont/UpdateUserCard/UpdateUserCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { instance } from "../../../services/AxiosHolder/AxiosHolder";
+import Banner from '../../../Comporont/Banner/Banner';
 
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
@@ -410,6 +411,10 @@ const AboutEmployeeScreen = () => {
             {error ? (
                 <Text style={styles.errorText}>{error}</Text>
             ) : null}
+
+
+                <Banner />
+
         </ScrollView>
     );
 }
@@ -514,6 +519,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 10,
     },
+  
 });
 
 export default AboutEmployeeScreen;

@@ -111,17 +111,17 @@ function EmployeCourseCard() {
         try {
             const storedUserData = await AsyncStorage.getItem('userData');
             const storedToken = await AsyncStorage.getItem('authToken');
-            
+
             const parsedUserData = JSON.parse(storedUserData);
-            const userId = parsedUserData.id; 
-            
+            const userId = parsedUserData.id;
+
             if (!userId || !storedToken) return;
 
             setError("");
 
             const response = await instance.get(`/user/getCvDocument/${userId}`, {
                 headers: { Authorization: `Bearer ${storedToken}` },
-                responseType: 'blob', 
+                responseType: 'blob',
             });
 
             if (response.data) {
@@ -130,7 +130,7 @@ function EmployeCourseCard() {
                 reader.onloadend = () => {
                     const base64String = reader.result;
                     console.log(base64String);
-                    Alert.alert("CV Document  Successfully");
+                    Alert.alert('Success', 'CV uploaded successfully');
                 };
                 reader.readAsDataURL(blob);
             }

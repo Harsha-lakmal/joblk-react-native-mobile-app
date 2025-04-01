@@ -10,6 +10,8 @@ const JobEmployeScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.cardContainer}>
+            <Text style={styles.headerText}>Job opportunity</Text>
+      
       
         <EmployeJobsCard/>
         <Banner/>
@@ -21,7 +23,14 @@ const JobEmployeScreen = () => {
 const styles = StyleSheet.create({
   cardContainer: {
     padding: 10,
-  }
+    
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color :"#6495ED"
+  }, 
  
 });
 

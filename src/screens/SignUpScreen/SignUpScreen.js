@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, TouchableOpacity, Keyboard, Alert } from 'react-native';
 import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -157,10 +157,12 @@ const SignUpScreen = () => {
             </View>
 
             <View style={styles.checkboxContainer}>
-              <Checkbox
-                status={tandc ? 'checked' : 'unchecked'}
+              <TouchableOpacity 
+                style={styles.customCheckbox}
                 onPress={() => setTandc(!tandc)}
-              />
+              >
+                {tandc && <View style={styles.checkboxInner} />}
+              </TouchableOpacity>
               <Text style={styles.checkboxText}>I agree to the Terms & Conditions</Text>
             </View>
 
@@ -168,7 +170,7 @@ const SignUpScreen = () => {
               mode="contained"
               onPress={handleSignUp}
               disabled={!tandc || loading}
-              style={styles.button}
+              style={[styles.button, (!tandc || loading) && styles.buttonDisabled]}
             >
               {loading ? 'Signing up...' : 'Sign Up'}
             </Button>
@@ -245,6 +247,24 @@ const styles = StyleSheet.create({
     width: '80%',
     alignSelf: 'center',
   },
+  customCheckbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: '#000',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxInner: {
+    width: 14,
+    height: 14,
+    backgroundColor: '#000',
+    borderRadius: 2,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  }
 });
 
 export default SignUpScreen;

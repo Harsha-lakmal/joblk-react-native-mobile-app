@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { instance } from '../../services/AxiosHolder/AxiosHolder';
 import { useNavigation } from '@react-navigation/native';
@@ -154,10 +154,12 @@ const LoginScreen = () => {
                         />
 
                         <View style={styles.checkboxContainer}>
-                            <Checkbox
-                                status={tandc ? 'checked' : 'unchecked'}
+                            <TouchableOpacity 
+                                style={styles.customCheckbox}
                                 onPress={() => setTandc(!tandc)}
-                            />
+                            >
+                                {tandc && <View style={styles.checkboxInner} />}
+                            </TouchableOpacity>
                             <Text style={styles.checkboxText}>I agree to the Terms & Conditions</Text>
                         </View>
 
@@ -165,7 +167,10 @@ const LoginScreen = () => {
                             mode="contained"
                             onPress={handleLogin}
                             disabled={!tandc || loading}
-                            style={styles.button}
+                            style={[
+                                styles.button,
+                                !tandc && styles.buttonDisabled
+                            ]}
                         >
                             {loading ? 'Logging in...' : 'Login'}
                         </Button>
@@ -219,6 +224,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
     },
+    customCheckbox: {
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: '#000',
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    checkboxInner: {
+        width: 14,
+        height: 14,
+        backgroundColor: '#000',
+        borderRadius: 2,
+    },
     checkboxText: {
         color: 'black',
         marginLeft: 8,
@@ -230,6 +250,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '80%',
         alignSelf: 'center',
+    },
+    buttonDisabled: {
+        opacity: 0.5,
     },
 });
 

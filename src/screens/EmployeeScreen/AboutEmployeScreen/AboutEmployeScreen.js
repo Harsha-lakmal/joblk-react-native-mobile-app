@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { instance } from "../../../services/AxiosHolder/AxiosHolder";
 import Banner from '../../../Comporont/Banner/Banner';
+import FilePickerManager from 'react-native-file-picker';
+
 
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
@@ -95,42 +97,34 @@ const AboutEmployeeScreen = () => {
         });
     };
 
-    const pickFile = (setFile) => {
-        const options = {
-            mediaType: 'document',
-            selectionLimit: 1,
-            includeBase64: false,
-        };
-
-        ImagePicker.launchImageLibrary(options, (response) => {
+    const pickFile = () => {
+        FilePickerManager.showFilePicker(null, (response) => {
             if (response.didCancel) {
                 console.log('User cancelled file picker');
                 return;
             }
             
-            if (response.errorCode) {
-                console.log('ImagePicker Error: ', response.errorMessage);
-                Alert.alert('Error', response.errorMessage || 'Failed to pick file');
+            if (response.error) {
+                console.log('FilePickerManager Error: ', response.error);
+                Alert.alert('Error', response.error || 'Failed to pick file');
                 return;
             }
             
-            if (response.assets && response.assets.length > 0) {
-                const selectedFile = response.assets[0];
-                
-                if (selectedFile.fileSize > 10 * 1024 * 1024) { 
-                    Alert.alert('Error', 'CV file should be less than 10MB');
-                    return;
-                }
-
-                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                if (!allowedTypes.includes(selectedFile.type)) {
-                    Alert.alert('Error', 'Only PDF and Word documents are allowed');
-                    return;
-                }
-
-                setFile(selectedFile);
-                uploadCV(selectedFile);
+            if (response.size > 100 * 1024 * 1024) { 
+                Alert.alert('Error', 'CV file should be less than 10MB');
+                return;
             }
+
+            const fileExtension = '.' + response.fileName.split('.').pop().toLowerCase();
+            const allowedExtensions = ['.pdf', '.doc', '.docx'];
+            
+            if (!allowedExtensions.includes(fileExtension)) {
+                Alert.alert('Error', 'Only PDF and Word documents are allowed');
+                return;
+            }
+
+            setCvFile(response);
+            uploadCV(response);
         });
     };
 
@@ -234,10 +228,24 @@ const AboutEmployeeScreen = () => {
         setLoading(true);
         setError("");
 
+        const getFileType = (fileName) => {
+            const extension = fileName.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'pdf':
+                    return 'application/pdf';
+                case 'doc':
+                    return 'application/msword';
+                case 'docx':
+                    return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                default:
+                    return 'application/octet-stream';
+            }
+        };
+
         const formData = new FormData();
         formData.append("file", {
             uri: file.uri,
-            type: file.type || 'application/pdf',
+            type: file.type || getFileType(file.fileName),
             name: file.fileName || `cv-${Date.now()}.pdf`, 
         });
 
@@ -248,8 +256,10 @@ const AboutEmployeeScreen = () => {
                     "Content-Type": "multipart/form-data",
                 },
             });
-
-            if (response.status === 200) {
+           
+        
+            if (response.data) {
+                
                 Alert.alert('Success', 'CV uploaded successfully');
             }
         } catch (err) {
@@ -392,9 +402,10 @@ const AboutEmployeeScreen = () => {
             <View style={styles.buttonWrapper}>
                 <UpdateUserCard />
 
-
-                <TouchableOpacity style={styles.loginButton} onPress={() => pickFile(setCvFile)}>
-                    <Text style={styles.loginButtonText}>Upload CV</Text>
+                <TouchableOpacity style={styles.loginButton} onPress={pickFile}>
+                    <Text style={styles.loginButtonText}>
+                        {cvFile ? `Your Cv Saved` : 'Upload CV'}
+                    </Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.loginButton} onPress={handleLogout}>
@@ -412,8 +423,7 @@ const AboutEmployeeScreen = () => {
                 <Text style={styles.errorText}>{error}</Text>
             ) : null}
 
-
-                <Banner />
+            <Banner />
 
         </ScrollView>
     );

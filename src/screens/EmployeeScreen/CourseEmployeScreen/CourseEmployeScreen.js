@@ -9,8 +9,10 @@ const CourseEmployeScreen = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.cardContainer}>
+                  <Text style={styles.headerText}>Course opportunity</Text>
+            
            <EmployeCourseCard/>
-           <Banner/>
+           <Banner style={styles.banner}/>
         </ScrollView>
     );
 };
@@ -18,7 +20,13 @@ const CourseEmployeScreen = () => {
 const styles = StyleSheet.create({
     cardContainer: {
         padding: 10,  
-    }
+    } ,   headerText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginVertical: 10,
+        color :"#6495ED"
+      },
+    
  
 });
 

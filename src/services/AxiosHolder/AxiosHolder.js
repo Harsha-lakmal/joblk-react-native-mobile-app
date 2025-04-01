@@ -14,14 +14,11 @@
 import axios from 'axios';
 
 export const instance = axios.create({
-  baseURL: 'http://192.168.213.184:8080/api/v1', 
+  baseURL: 'http://192.168.171.184:8080/api/v1', 
   timeout: 1000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
-
-
-
 
 

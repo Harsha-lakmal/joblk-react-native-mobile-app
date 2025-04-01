@@ -8,11 +8,12 @@ const HomeEmployeScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.cardContainer}>
       <Text style={styles.headerText}>Job opportunity</Text>
-      <EmployeCourseCard />
+      <EmployeCourseCard /> 
 
       <Text style={styles.headerText}>Course opportunity</Text>
       <EmployeJobsCard />
       <Banner style={styles.banner}/>
+     
     </ScrollView>
   );
 };
@@ -25,14 +26,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 10,
+    color :"#6495ED"
   },
   banner: {
-    position : "absolute" ,
-  
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 999
+    position: 'relative', // Changed from 'absolute' and 'sticky' to 'fixed'
+    bottom: 22,
+    right: 20,
+    zIndex: 1000
 
 
   }

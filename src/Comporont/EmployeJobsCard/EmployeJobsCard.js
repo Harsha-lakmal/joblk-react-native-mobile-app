@@ -106,7 +106,7 @@ const EmployeJobsCard = () => {
             reader.onloadend = () => {
                 const base64String = reader.result;
                 console.log(base64String);
-                Alert.alert("CV Document  Successfully");
+                    Alert.alert('Success', 'CV uploaded successfully');
             };
             reader.readAsDataURL(blob);
         }

@@ -8,7 +8,6 @@ import { instance } from "../../../services/AxiosHolder/AxiosHolder";
 import Banner from '../../../Comporont/Banner/Banner';
 import FilePickerManager from 'react-native-file-picker';
 
-
 const AboutEmployeeScreen = () => {
     const [coverImage, setCoverImage] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
@@ -167,7 +166,7 @@ const AboutEmployeeScreen = () => {
                 },
             });
 
-            if (response.status === 200) {
+            if (response.data) {
                 await getCoverImage();
                 Alert.alert('Success', 'Cover image uploaded successfully');
             }
@@ -205,7 +204,7 @@ const AboutEmployeeScreen = () => {
                 },
             });
 
-            if (response.status === 200) {
+            if (response.data) {
                 await getProfileImage();
                 Alert.alert('Success', 'Profile image uploaded successfully');
             }
@@ -331,111 +330,119 @@ const AboutEmployeeScreen = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <TouchableOpacity onPress={() => pickImage(setCoverImage)} style={styles.coverImageContainer}>
-                {coverImageLoading ? (
-                    <View style={styles.imageLoading}>
-                        <ActivityIndicator size="large" color="#007bff" />
-                    </View>
-                ) : (
-                    <Image
-                        source={
-                            coverImage?.uri 
-                                ? { uri: coverImage.uri }
-                                : require('../../../assets/joblk.png')
-                        }
-                        style={styles.coverImage}
-                        resizeMode="cover"
-                        onError={(e) => {
-                            console.log('Cover image error:', e.nativeEvent.error);
-                            setCoverImage(null);
-                        }}
-                    />
-                )}
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => pickImage(setProfileImage)} style={styles.profileImageContainer}>
-                {profileImageLoading ? (
-                    <View style={styles.imageLoading}>
-                        <ActivityIndicator size="large" color="#007bff" />
-                    </View>
-                ) : (
-                    <Image
-                        source={
-                            profileImage?.uri 
-                                ? { uri: profileImage.uri }
-                                : require('../../../assets/joblk.png')
-                        }
-                        style={styles.profileImage}
-                        resizeMode="cover"
-                        onError={(e) => {
-                            console.log('Profile image error:', e.nativeEvent.error);
-                            setProfileImage(null);
-                        }}
-                    />
-                )}
-            </TouchableOpacity>
-
-            <View style={styles.infoContainer}>
-                {userData && (
-                    <>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.label}>Name</Text>
-                            <Text style={styles.value}>{userData.username}</Text>
+        <View style={styles.mainContainer}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <TouchableOpacity onPress={() => pickImage(setCoverImage)} style={styles.coverImageContainer}>
+                    {coverImageLoading ? (
+                        <View style={styles.imageLoading}>
+                            <ActivityIndicator size="large" color="#007bff" />
                         </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.label}>Email</Text>
-                            <Text style={styles.value}>{userData.email}</Text>
-                        </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.label}>Role</Text>
-                            <Text style={styles.value}>{userData.role}</Text>
-                        </View>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.label}>Password</Text>
-                            <Text style={styles.value}>••••••</Text>
-                        </View>
-                    </>
-                )}
-            </View>
-
-            <View style={styles.buttonWrapper}>
-                <UpdateUserCard />
-
-                <TouchableOpacity style={styles.loginButton} onPress={pickFile}>
-                    <Text style={styles.loginButtonText}>
-                        {cvFile ? `Your Cv Saved` : 'Upload CV'}
-                    </Text>
+                    ) : (
+                        <Image
+                            source={
+                                coverImage?.uri 
+                                    ? { uri: coverImage.uri }
+                                    : require('../../../assets/joblk.png')
+                            }
+                            style={styles.coverImage}
+                            resizeMode="cover"
+                            onError={(e) => {
+                                console.log('Cover image error:', e.nativeEvent.error);
+                                setCoverImage(null);
+                            }}
+                        />
+                    )}
                 </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogout}>
-                    <Text style={styles.loginButtonText}>Logout</Text>
-                </TouchableOpacity>
-            </View>
 
+                <TouchableOpacity onPress={() => pickImage(setProfileImage)} style={styles.profileImageContainer}>
+                    {profileImageLoading ? (
+                        <View style={styles.imageLoading}>
+                            <ActivityIndicator size="large" color="#007bff" />
+                        </View>
+                    ) : (
+                        <Image
+                            source={
+                                profileImage?.uri 
+                                    ? { uri: profileImage.uri }
+                                    : require('../../../assets/joblk.png')
+                            }
+                            style={styles.profileImage}
+                            resizeMode="cover"
+                            onError={(e) => {
+                                console.log('Profile image error:', e.nativeEvent.error);
+                                setProfileImage(null);
+                            }}
+                        />
+                    )}
+                </TouchableOpacity>
+
+                <View style={styles.infoContainer}>
+                    {userData && (
+                        <>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.label}>Name</Text>
+                                <Text style={styles.value}>{userData.username}</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.label}>Email</Text>
+                                <Text style={styles.value}>{userData.email}</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.label}>Role</Text>
+                                <Text style={styles.value}>{userData.role}</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Text style={styles.label}>Password</Text>
+                                <Text style={styles.value}>••••••</Text>
+                            </View>
+                        </>
+                    )}
+                </View>
+
+                <View style={styles.buttonWrapper}>
+                    <UpdateUserCard />
+
+                    <TouchableOpacity style={styles.loginButton} onPress={pickFile}>
+                        <Text style={styles.loginButtonText}>
+                            {cvFile ? `Your Cv Saved` : 'Upload CV'}
+                        </Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity style={styles.loginButton} onPress={handleLogout}>
+                        <Text style={styles.loginButtonText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {error ? (
+                    <Text style={styles.errorText}>{error}</Text>
+                ) : null}
+
+                <View style={styles.bottomPadding} />
+            </ScrollView>
+
+            <Banner />
+            
             {loading && (
                 <View style={styles.loadingOverlay}>
                     <ActivityIndicator size="large" color="#007bff" />
                 </View>
             )}
-
-            {error ? (
-                <Text style={styles.errorText}>{error}</Text>
-            ) : null}
-
-            <Banner />
-
-        </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        position: 'relative',
+        backgroundColor: '#f5f5f5',
+    },
     container: {
         flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
         padding: 20,
+        paddingBottom: 100, 
     },
     coverImageContainer: {
         width: '100%',
@@ -523,13 +530,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 2000, 
     },
     errorText: {
         color: 'red',
         textAlign: 'center',
         marginTop: 10,
     },
-  
+    bottomPadding: {
+        height: 80, 
+    }
 });
 
 export default AboutEmployeeScreen;

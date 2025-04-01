@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  KeyboardAvoidingView, 
-  Platform, 
-  FlatList, 
-  Image 
-} from 'react-native';
+import {  View,  Text, TextInput, TouchableOpacity,  StyleSheet,  KeyboardAvoidingView, Platform, FlatList,  Image} from 'react-native';
 
 const Banner = () => {
   const [messages, setMessages] = useState([]);
@@ -20,16 +10,56 @@ const Banner = () => {
 
   const botResponses = [
     {
+      keywords: ['hello'],
+      responses: ["Hello there! What help do you need from me?"],
+    },
+    {
+      keywords: ['hi'],
+      responses: ["Hi! How can I help you?"],
+    },
+    {
+      keywords: ['hey'],
+      responses: ["Hey! What's up?"],
+    },
+    {
       keywords: ['hello', 'hi', 'hey'],
       responses: ["Hello there!", "Hi! How can I help you?", "Hey! What's up?"],
     },
     {
-      keywords: ['how are you', "how's it going"],
-      responses: ["I'm doing well, thank you!", "I'm just a bot, but I'm functioning perfectly!", "All systems operational!"],
+      keywords: ['job details'],
+      responses: ["You can find out about our job opportunities through our posts. If you have any questions, you can contact us."],
+    },
+    {
+      keywords: ['course details'],
+      responses: ["You can find out about our course opportunities through our posts. If you have any questions, you can contact us."],
+    },
+    {
+      keywords: ['how are you'],
+      responses: ["I'm doing well, thank you!"],
+    },
+    {
+      keywords: ["how's it going"],
+      responses: ["I'm just a bot, but I'm functioning perfectly!"],
     },
     {
       keywords: ['thanks', 'thank you'],
       responses: ["You're welcome!", "Happy to help!", "No problem at all!"],
+    },
+    {
+      keywords: ['thanks'],
+      responses: ["You're welcome!"],
+    },
+    {
+      keywords: ['good morning'],
+      responses: ["Good morning. Welcome to Joblk Sport Team"],
+    },
+    {
+      keywords: ['good evening'],
+      responses: ["Good evening, Welcome to joblk Sport team"],
+    },
+    {
+      keywords: ['thank you'],
+      responses: ["Happy to help!"],
     },
     {
       keywords: ['bye', 'goodbye'],
@@ -38,9 +68,7 @@ const Banner = () => {
     {
       keywords: ['default'],
       responses: [
-        "I'm not sure I understand. Can you rephrase that?",
-        "Interesting! Tell me more.",
-        "I'm still learning. Could you ask me something else?",
+        "I don't understand what you're saying. What do you need my help with?",
       ],
     },
   ];
@@ -136,7 +164,7 @@ const Banner = () => {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
         >
           <View style={styles.chatHeader}>
-            <Text style={styles.headerText}>ChatBot</Text>
+            <Text style={styles.headerText}>joblk</Text>
             <View style={styles.headerButtons}>
               {showCancel && (
                 <TouchableOpacity 

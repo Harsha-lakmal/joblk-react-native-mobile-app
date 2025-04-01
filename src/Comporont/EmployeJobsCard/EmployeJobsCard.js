@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import JoblkImge from '../../assets/joblk.png';
-import FilePickerManager from 'react-native-file-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { instance } from '../../services/AxiosHolder/AxiosHolder';
 
@@ -112,7 +111,7 @@ const EmployeJobsCard = () => {
         }
 
     } catch (err) {
-        Alert.alert("Failed to  CV document ");
+             Alert.alert('Failed', 'CV  document uploaded Unsuccessfully');
         console.error("Error fetching CV document:", err.response || err);
     }
 }

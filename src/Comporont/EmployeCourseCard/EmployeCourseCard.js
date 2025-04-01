@@ -137,6 +137,7 @@ function EmployeCourseCard() {
 
         } catch (err) {
             Alert.alert("Failed to  CV document ");
+             Alert.alert('Failed', 'CV  document uploaded Unsuccessfully');
             console.error("Error fetching CV document:", err.response || err);
         }
     };

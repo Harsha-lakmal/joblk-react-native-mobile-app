@@ -5,29 +5,33 @@ import EmployeCourseCard from '../../../Comporont/EmployeCourseCard/EmployeCours
 import Banner from '../../../Comporont/Banner/Banner';
 
 const CourseEmployeScreen = () => {
-  
-
-    return (
-        <ScrollView contentContainerStyle={styles.cardContainer}>
-                  <Text style={styles.headerText}>Course opportunity</Text>
-            
-           <EmployeCourseCard/>
-           <Banner style={styles.banner}/>
-        </ScrollView>
-    );
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.cardContainer}>
+        <Text style={styles.headerText}>Course opportunity</Text>
+        <EmployeCourseCard/>
+      </ScrollView>
+      
+      <Banner />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    cardContainer: {
-        padding: 10,  
-    } ,   headerText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginVertical: 10,
-        color :"#6495ED"
-      },
-    
- 
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
+  cardContainer: {
+    padding: 10,
+    paddingBottom: 100, 
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color: "#6495ED"
+  },
 });
 
 export default CourseEmployeScreen;

@@ -1,40 +1,39 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Text } from 'react-native';
+import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import EmployeCourseCard from '../../../Comporont/EmployeCourseCard/EmployeCourseCard';
 import EmployeJobsCard from '../../../Comporont/EmployeJobsCard/EmployeJobsCard';
 import Banner from '../../../Comporont/Banner/Banner';
 
 const HomeEmployeScreen = () => {
   return (
-    <ScrollView contentContainerStyle={styles.cardContainer}>
-      <Text style={styles.headerText}>Job opportunity</Text>
-      <EmployeCourseCard /> 
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.cardContainer}>
+        <Text style={styles.headerText}>Job opportunity</Text>
+        <EmployeCourseCard /> 
 
-      <Text style={styles.headerText}>Course opportunity</Text>
-      <EmployeJobsCard />
-      <Banner style={styles.banner}/>
-     
-    </ScrollView>
+        <Text style={styles.headerText}>Course opportunity</Text>
+        <EmployeJobsCard />
+      </ScrollView>
+      
+      <Banner />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
   cardContainer: {
     padding: 10,
+    paddingBottom: 100, 
   },
   headerText: {
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 10,
-    color :"#6495ED"
-  },
-  banner: {
-    position: 'relative', // Changed from 'absolute' and 'sticky' to 'fixed'
-    bottom: 22,
-    right: 20,
-    zIndex: 1000
-
-
+    color: "#6495ED"
   }
 });
 

@@ -81,7 +81,7 @@ function EmployeCourseCard() {
                 [courseId]: imageUri,
             }));
         } catch (err) {
-            console.error("Error fetching image:", err);
+            
         }
     };
 

@@ -82,6 +82,7 @@ function EmployeCourseCard() {
             }));
         } catch (err) {
             
+            console.error("Error fetching image:", err);
         }
     };
 
